@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.3","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.4","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 local settings = {}
@@ -21,7 +21,8 @@ local function convertText(textElement)
 	content = content:gsub("</p>", "")
 	content = content:gsub("<br>", "")
 	content = content:gsub("<hr>", "-------------------")
-	print(content)
+
+	return content
 end
 
 --- @param chapterURL string
