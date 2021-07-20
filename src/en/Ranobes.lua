@@ -1,15 +1,25 @@
--- {"id":333,"ver":"1.0.4","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.5","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 local settings = {}
 
+-- Used in map for genres, tags and authors
 local text = function(v) return v:text() end
+
+--- @param url string The path which should extend the baseURL
+--- @return string The baseURL extended by path
+local function expandURL(url)
+	if url:find("ranobes.net") ~= nil then
+		return url
+	else
+		print("Needed to be expanded: " .. url)
+		return baseURL .. url
+	end
+end
 
 --- @param textElement, HTML element, which contains the text that should be converted (so either contains <p> or <br>)
 --- @return string formatted text with manual line breaks (\n)
 local function convertText(textElement)
-	--textElement = GETDocument("https://ranobes.net/up/the-perfect-run/1015664-1.html"):select("div.story > div#arrticle")
-
 	-- Remove unwanted html elements
 	textElement:select("div.free-support"):remove() -- Chapter Ads
 	textElement:select("style"):remove() -- Description Style
@@ -28,7 +38,7 @@ end
 --- @param chapterURL string
 --- @return string
 local function getPassage(chapterURL)
-	return convertText(GETDocument(chapterURL):select("div.story > div#arrticle"))
+	return convertText(GETDocument(expandURL(chapterURL)):select("div.story > div#arrticle"))
 	--return table.concat(mapNotNil(GETDocument(chapterURL):select("div.story"):select("p"), text), "\n")
 end
 
@@ -37,14 +47,12 @@ end
 --- @param loadChapters boolean, if true then also load the chapter list, otherwise not
 --- @return NovelInfo
 local function parseNovel(novelURL, loadChapters)
-	local doc = GETDocument(novelURL)
-	local wrap = doc:selectFirst("div.structure.str_fullview")
-	local novel = wrap:selectFirst("div.str_left")
+	local novel = GETDocument(expandURL(novelURL)):selectFirst("div.structure.str_fullview > div.str_left")
 
 	local info = NovelInfo {
-		title = novel:selectFirst("span[itemprop=\"name\"]"):text(),
-		imageUrl = novel:selectFirst("a[href].highslide"):attr("href"),
-		--escription = novel:selectFirst("div[itemprop=\"description\"]"):text(), -- TODO mehrzeilig machen
+		title = novel:selectFirst("[itemprop=\"name\"]"):text(), -- is a span when there is no alternative title, otherwise a h1
+		imageURL = expandURL(novel:selectFirst("a[href].highslide"):attr("href")),
+		--description = novel:selectFirst("div[itemprop=\"description\"]"):text(), -- has no line breaks
 		description = convertText(novel:selectFirst("div[itemprop=\"description\"]")),
 		genres = map(novel:selectFirst("div[itemprop=\"genre\"]"):select("a"), text),
 		tags = map(novel:selectFirst("div[itemprop=\"keywords\"]"):select("a"), text),
@@ -63,26 +71,26 @@ local function parseNovel(novelURL, loadChapters)
 				local titleElement = article:selectFirst("a")
 				return NovelChapter {
 					title = titleElement:selectFirst("h6"):text(),
-					link = titleElement:attr("href"),
+					link = expandURL(titleElement:attr("href")),
 					release = titleElement:selectFirst("small"):text()
 				}
 			end)
 		end
 
-		-- Table of content pages are found at <baseURL>/up/<toc URL extension>/page/<page number>/
-		local tocURLextension = wrap:selectFirst("a[href][title=\"Go to table of contents\"]"):attr("href")
+		-- Table of content pages are found at <baseURL>/up/<novel name path>/page/<page number>/
+		local toc_path = novel:selectFirst("a[href][title=\"Go to table of contents\"]"):attr("href")
 
 		-- Get chapters of first table of content page
-		local toc_page_one = GETDocument(baseURL .. tocURLextension):selectFirst("div #dle-content")
-		local chapters = { parseChapters(toc_page_one) }
+		local chaptersDocument = GETDocument(expandURL(toc_path)):selectFirst("div #dle-content")
+		local chapters = { parseChapters(chaptersDocument) }
 
 		-- There can be more chapters in other pages
-		local navBox = toc_page_one:selectFirst("div.block.navigation.ignore-select")
+		local navBox = chaptersDocument:selectFirst("div.block.navigation.ignore-select")
 		if navBox then
 			local maxPage = tonumber(navBox:selectFirst("div.pages > a:last-child"):text())
 
 			for page = 2, maxPage do
-				local chaptersDocument = GETDocument(baseURL .. tocURLextension .. "/page/" .. page .. "/"):selectFirst("div #dle-content")
+				chaptersDocument = GETDocument(expandURL(toc_path) .. "page/" .. page .. "/"):selectFirst("div #dle-content")
 				chapters[page] = parseChapters(chaptersDocument)
 			end
 		end
@@ -116,13 +124,25 @@ return {
 	-- Must have at least one value
 	listings = {
 		Listing("Novels", true, function(data)
-			return map(GETDocument(baseURL .. "/novels/page/" .. data[PAGE] .. "/")
+			return map(GETDocument(expandURL("/novels/page/" .. data[PAGE] .. "/"))
 					:selectFirst("div#dle-content")
-					:select("article.block"), function(e)
+					:select("article.block.story"), function(e)
 				return Novel {
 					title = e:selectFirst("h2.title > a"):text(),
-					link = e:selectFirst("h2.title > a"):attr("href"),
-					imageURL = e:selectFirst("figure.cover"):attr("style"):sub(23, -3)
+					link = expandURL(e:selectFirst("h2.title > a"):attr("href")),
+					imageURL = expandURL(e:selectFirst("figure.cover"):attr("style"):sub(23, -3))
+				}
+			end)
+		end),
+		Listing("Latest Updates", true, function(data)
+			return map(GETDocument(expandURL("/updates/page/" .. data[PAGE] .. "/"))
+					:selectFirst("div#mainside > div.str_left")
+					:select("div.block.story_line"), function(e)
+				return Novel {
+					title = e:selectFirst("a > div > h3.title"):text(),
+					link = expandURL(GETDocument(expandURL(e:selectFirst("a"):attr("href")))
+							:selectFirst("h1[itemprop=\"headline\"] > div.category > a"):attr("href")),
+					imageURL = expandURL(e:selectFirst("a > i.image.cover"):attr("style"):sub(22, -2))
 				}
 			end)
 		end)
