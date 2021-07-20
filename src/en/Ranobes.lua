@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.0","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.1","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 local settings = {}
@@ -51,7 +51,7 @@ local function parseNovel(novelURL, loadChapters)
 		local tocURLextension = wrap:selectFirst("a[href][title=\"Go to table of contents\"]"):attr("href")
 
 		-- Get chapters of first table of content page
-		local toc_page_one = GETDocument(baseURL .. "/up/" .. tocURLextension .. "/"):selectFirst("div #dle-content")
+		local toc_page_one = GETDocument(baseURL .. tocURLextension):selectFirst("div #dle-content")
 		local chapters = { parseChapters(toc_page_one) }
 
 		-- There can be more chapters in other pages
@@ -60,7 +60,7 @@ local function parseNovel(novelURL, loadChapters)
 			local maxPage = tonumber(navBox:selectFirst("div.pages > a:last-child"):text())
 
 			for page = 2, maxPage do
-				local chaptersDocument = GETDocument(baseURL .. "/up/" .. tocURLextension .. "/page/" .. page .."/"):selectFirst("div #dle-content")
+				local chaptersDocument = GETDocument(baseURL .. tocURLextension .. "/page/" .. page .. "/"):selectFirst("div #dle-content")
 				chapters[page] = parseChapters(chaptersDocument)
 			end
 		end
