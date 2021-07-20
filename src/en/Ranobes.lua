@@ -1,9 +1,41 @@
--- {"id":333,"ver":"1.0.1","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.2","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 local settings = {}
 
 local text = function(v) return v:text() end
+
+--- @param textElement, HTML element, which contains the text that should be converted (so either contains <p> or <br>)
+--- @return string formatted text with manual line breaks (\n)
+local function convertText(textElement)
+	-- Determine whether the text is formatted using <br> as line breaks or using <p>
+	local containsBR = false
+	local containsP = false
+	if textElement:selectFirst("br") ~= nil then
+		containsBR = true
+	end
+	if textElement:selectFirst("p") ~= nil then
+		containsP = true
+	end
+	print("containsBR: .. " .. (containsBR and 'true' or 'false'))
+	print("containsP: .. " .. (containsP and 'true' or 'false'))
+
+	-- Convert the text using the appropiate method
+	--textElement = GETDocument("https://ranobes.net/up/the-perfect-run/1015664-1.html"):select("div.story > div#arrticle")
+
+	-- Remove unwanted html elements
+	textElement:select("div.free-support"):remove() -- Chapter Ads
+	textElement:select("style"):remove() -- Description Style
+
+	-- Filter text
+	local content = textElement:html()
+	content = content:gsub("&nbsp;", " ")
+	content = content:gsub("<p>", "")
+	content = content:gsub("</p>", "")
+	content = content:gsub("<br>", "")
+	content = content:gsub("<hr>", "-------------------")
+	print(content)
+end
 
 --- @param chapterURL string
 --- @return string
@@ -20,10 +52,13 @@ local function parseNovel(novelURL, loadChapters)
 	local wrap = doc:selectFirst("div.structure.str_fullview")
 	local novel = wrap:selectFirst("div.str_left")
 
+	convertText(novel:selectFirst("div[itemprop=\"description\"]"))
+
 	local info = NovelInfo {
 		title = novel:selectFirst("span[itemprop=\"name\"]"):text(),
 		imageUrl = novel:selectFirst("a[href].highslide"):attr("href"),
 		description = novel:selectFirst("div[itemprop=\"description\"]"):text(), -- TODO mehrzeilig machen
+		--description = convertText(novel:selectFirst("div[itemprop=\"description\"]")),
 		genres = map(novel:selectFirst("div[itemprop=\"genre\"]"):select("a"), text),
 		tags = map(novel:selectFirst("div[itemprop=\"keywords\"]"):select("a"), text),
 		authors = map(novel:selectFirst("span[itemprop=\"author\"]"):select("a"), text),
