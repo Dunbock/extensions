@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.6","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.7","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 local settings = {}
@@ -36,10 +36,10 @@ local function parseNovelsOverview(page, searchParameter)
 	-- Build the URL
 	local url = "/novels"
 
-	if not searchParameter then
+	if searchParameter ~= nil then
 		url = url .. searchParameter
 	end
-	if not page then
+	if page ~= nil then
 		url = url .. "/page/" .. page
 	end
 
@@ -97,7 +97,7 @@ local function parseNovel(novelURL, loadChapters)
 		status = ({
 			Active = NovelStatus.PUBLISHING,
 			Completed = NovelStatus.COMPLETED,
-			Unknown = NovelStatus.UKNOWN,
+			Unknown = NovelStatus.UNKNOWN,
 			Break = NovelStatus.PAUSED
 		})[status:text()]
 	else
@@ -105,7 +105,7 @@ local function parseNovel(novelURL, loadChapters)
 		status = ({
 			Ongoing = NovelStatus.PUBLISHING,
 			Completed = NovelStatus.COMPLETED,
-			Dropped = NovelStatus.UKNOWN,
+			Dropped = NovelStatus.UNKNOWN,
 			Hiatus = NovelStatus.PAUSED
 		})[status:text()]
 	end
@@ -113,7 +113,7 @@ local function parseNovel(novelURL, loadChapters)
 	local info = NovelInfo {
 		title = novel:selectFirst("[itemprop=\"name\"]"):text(), -- is a span when there is no alternative title, otherwise a h1
 		imageURL = expandURL(novel:selectFirst("a[href].highslide"):attr("href")),
-		description = convertText(novel:selectFirst("div[itemprop=\"description\"]")),
+		description = convertToText(novel:selectFirst("div[itemprop=\"description\"]")),
 		genres = map(novel:selectFirst("div[itemprop=\"genre\"]"):select("a"), text),
 		tags = map(novel:selectFirst("div[itemprop=\"keywords\"]"):select("a"), text),
 		authors = map(novel:selectFirst("span[itemprop=\"author\"]"):select("a"), text),
