@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.5","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.6","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 local settings = {}
