@@ -1,7 +1,9 @@
--- {"id":333,"ver":"1.0.8","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.8","libVer":"1.0.0","author":"Dunbock","dep":["Utility>=1.0.0"]}
+
+-- Dependencies
+local UtilityLib = Require("Utility")
 
 local baseURL = "https://www.ranobes.net"
-local settings = {}
 
 -- Used in map for genres, tags and authors
 local text = function(v) return v:text() end
@@ -43,7 +45,6 @@ local function parseNovelsOverview(page, searchParameter)
 		url = url .. "/page/" .. page
 	end
 
-	print("URL: " .. url)
 	-- Check if there is a search result or a page with that page number and if so parse it, otherwise return no novels.
 	local doc = GETDocument(expandURL(url)):selectFirst("div.str_left")
 	if doc:selectFirst("div.alert") then
@@ -81,7 +82,7 @@ end
 --- @param chapterURL string The link to the chapter, which contains the chapter content.
 --- @return string The chapter text without the headline as plain text.
 local function getPassage(chapterURL)
-	return convertToText(GETDocument(expandURL(chapterURL)):select("div.story > div#arrticle"))
+	return UtilityLib.convertToText(GETDocument(expandURL(chapterURL)):select("div.story > div#arrticle"))
 end
 
 --	based on ReadLightNovel.lua
