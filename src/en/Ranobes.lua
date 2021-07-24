@@ -166,7 +166,7 @@ local function search(data)
 
 	-- Novel title must contain
 	if data[QUERY] ~= ""  then
-		searchParameter = searchParameter .. "/l.title" .. parseToURL(data[QUERY])
+		searchParameter = searchParameter .. "/l.title=" .. data[QUERY]
 	end
 
 	-- Get search result.
