@@ -1,7 +1,6 @@
--- {"id":333,"ver":"1.0.0","libVer":"1.0.0","author":"Dunbock","dep":["Utility>=1.0.0"]}
+-- {"id":334,"ver":"1.0.0","libVer":"1.0.0","author":"Dunbock","dep":["Utility>=1.0.0"]}
 
--- Dependencies
-local convertToText = Require("Utility")
+local convertToText = Require("Utility").convertToText
 
 local baseURL = "dummyBaseURL"
 
@@ -25,7 +24,7 @@ local function parseNovel(novelURL, loadChapters)
         title = "dummy",
         link = "dummyParseNovelURL",
         imageURL = "https://via.placeholder.com/150.png",
-        description = UtilityLib.convertToText("dummy element", true),
+        description = convertToText("dummy element", true),
         authors = { "Author dummy" },
         genres = { "Genre1", "Genre2" },
         tags = { "Tag1", "Tag2" },
