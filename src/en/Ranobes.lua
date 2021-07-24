@@ -161,12 +161,11 @@ local function search(data)
 		return text:gsub(" ", "+")
 	end
 	-- Create Search String
-	local searchParameter = "/f"
-	local runner = ""
+	local searchParameter = "No Search Query"
 
 	-- Novel title must contain
 	if data[QUERY] ~= ""  then
-		searchParameter = searchParameter .. "/l.title=" .. data[QUERY]
+		searchParameter = data[QUERY]
 	end
 
 	-- Get search result.
