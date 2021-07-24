@@ -23,7 +23,7 @@ end
 --- @param removeDefaultElements boolean Whether the default HTML-element removal shall take place.
 --- @return string The chapter text without the headline as plain text.
 local function convertToText(htmlElement, removeDefaultElements)
-    return "Utility used"
+    return "Utility used with .. " .. htmlElement
     -- Remove unwanted html elements.
     if removeDefaultElements == true then
         removeUnwantedElements(htmlElement)

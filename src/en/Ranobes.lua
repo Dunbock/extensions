@@ -90,6 +90,15 @@ end
 --- @param loadChapters boolean Determines whether the chapter list also gets loaded.
 --- @return NovelInfo The information about the novel of the novelURL.
 local function parseNovel(novelURL, loadChapters)
+
+	return { Novel {
+		title = "dummy",
+		link = "https://ranobes.net/novels/1023685-i-shall-devour-everything.html",
+		imageURL = "https://via.placeholder.com/150.png",
+		description = UtilityLib.convertToText("dummy element", true),
+		authors = { "Author dummy" }
+	} }
+
 	-- Get novel webpage and parse novel information from it.
 	local novel = GETDocument(expandURL(novelURL)):selectFirst("div.structure.str_fullview > div.str_left")
 
