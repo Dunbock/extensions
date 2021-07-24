@@ -1,7 +1,4 @@
--- {"id":333,"ver":"1.0.8","libVer":"1.0.0","author":"Dunbock","dep":["Utility>=1.0.0"]}
-
--- Dependencies
-local UtilityLib = Require("Utility")
+-- {"id":333,"ver":"1.0.9","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -64,25 +61,13 @@ end
 --- @param textElement string HTML-element, which contains the text (using <p> or <br>) that should be converted.
 --- @return string The chapter text without the headline as plain text.
 local function convertToText(htmlElement)
-	-- Remove unwanted html elements.
-	htmlElement:select("div.free-support"):remove() -- Chapter Ads
-	htmlElement:select("style"):remove() -- Description Style
-
-	-- Get the actual chapter content and remove the html. Due to the HTML format no need to add line breaks.
-	local content = htmlElement:html()
-	content = content:gsub("&nbsp;", " ")
-	content = content:gsub("<p>", "")
-	content = content:gsub("</p>", "")
-	content = content:gsub("<br>", "")
-	content = content:gsub("<hr>", "-------------------")
-
-	return content
+	return htmlElement
 end
 
 --- @param chapterURL string The link to the chapter, which contains the chapter content.
 --- @return string The chapter text without the headline as plain text.
 local function getPassage(chapterURL)
-	return UtilityLib.convertToText(GETDocument(expandURL(chapterURL)):select("div.story > div#arrticle"), true)
+	return convertToText(GETDocument(expandURL(chapterURL)):select("div.story > div#arrticle"), true)
 end
 
 --	based on ReadLightNovel.lua
@@ -116,7 +101,7 @@ local function parseNovel(novelURL, loadChapters)
 		title = novel:selectFirst("[itemprop=\"name\"]"):text(),
 		-- title is a span when there is no alternative title, otherwise a h1. Therefore leave element name out.
 		imageURL = expandURL(novel:selectFirst("a[href].highslide"):attr("href")),
-		description = convertToText(novel:selectFirst("div[itemprop=\"description\"]")),
+		description = convertToText("parseNovel"),
 		genres = map(novel:selectFirst("div[itemprop=\"genre\"]"):select("a"), text),
 		tags = map(novel:selectFirst("div[itemprop=\"keywords\"]"):select("a"), text),
 		authors = map(novel:selectFirst("span[itemprop=\"author\"]"):select("a"), text),
@@ -208,18 +193,6 @@ return {
 	listings = {
 		Listing("Novels", true, function(data)
 			return parseNovelsOverview(data[PAGE], nil)
-		end),
-		Listing("Latest Updates", true, function(data)
-			return map(GETDocument(expandURL("/updates/page/" .. data[PAGE] .. "/"))
-					:selectFirst("div#mainside > div.str_left")
-					:select("div.block.story_line"), function(e)
-				return Novel {
-					title = e:selectFirst("a > div > h3.title"):text(),
-					link = expandURL(GETDocument(expandURL(e:selectFirst("a"):attr("href")))
-							:selectFirst("h1[itemprop=\"headline\"] > div.category > a"):attr("href")),
-					imageURL = expandURL(e:selectFirst("a > i.image.cover"):attr("style"):sub(22, -2))
-				}
-			end)
 		end)
 	},
 

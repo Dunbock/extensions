@@ -1,9 +1,5 @@
 {
   "libraries": [
-    {
-      "name": "Utility",
-      "ver": "1.0.1"
-    }
   ],
   "scripts": [
     {
@@ -13,16 +9,6 @@
       "id": 333,
       "lang": "en",
       "ver": "1.0.9",
-      "libVer": "1.0.0",
-      "md5": ""
-    },
-    {
-      "name": "Utility Debug",
-      "fileName": "UtilityDebug",
-      "imageURL": "https://github.com/dunbock/extensions/raw/impl-ranobes.net/icons/Ranobes.png",
-      "id": 334,
-      "lang": "en",
-      "ver": "1.0.1",
       "libVer": "1.0.0",
       "md5": ""
     }
