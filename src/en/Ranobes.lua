@@ -82,7 +82,7 @@ end
 --- @param chapterURL string The link to the chapter, which contains the chapter content.
 --- @return string The chapter text without the headline as plain text.
 local function getPassage(chapterURL)
-	return UtilityLib.convertToText(GETDocument(expandURL(chapterURL)):select("div.story > div#arrticle"))
+	return UtilityLib.convertToText(GETDocument(expandURL(chapterURL)):select("div.story > div#arrticle"), true)
 end
 
 --	based on ReadLightNovel.lua
@@ -185,7 +185,12 @@ local function search(data)
 	end
 
 	-- Get search result.
-	return parseNovelsOverview(data[PAGE], searchParameter)
+	--return parseNovelsOverview(data[PAGE], searchParameter)
+	return { Novel {
+		title = searchParameter,
+		link = "dummy",
+		imageURL = "https://via.placeholder.com/150.png"
+	} }
 end
 
 return {
