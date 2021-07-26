@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.12","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.13","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -172,7 +172,7 @@ local function search(data)
 	--return parseNovelsOverview(data[PAGE], searchParameter)
 	return { Novel {
 		title = searchParameter,
-		link = "dummy",
+		link = "dummyLinkQuery=" .. searchParameter,
 		imageURL = "https://via.placeholder.com/150.png"
 	} }
 end
