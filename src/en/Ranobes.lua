@@ -1,18 +1,20 @@
--- {"id":333,"ver":"1.0.20","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.21","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
 -- Used in map for genres, tags and authors
 local text = function(v) return v:text() end
 
+--- @param url string The URL that should be shrunk to the path
+--- @return string An URL path
+local function shrinkURL(url)
+	return url:gsub(".-ranobes%.net", "")
+end
+
 --- @param url string The path which should extend the baseURL
 --- @return string The baseURL extended by path
 local function expandURL(url)
 	return shrinkURL(url) .. baseURL
-end
-
-local function shrinkURL(url)
-	return url:gsub(".-ranobes%.net", "")
 end
 
 --- @param page number | nil The page number that is requested.
