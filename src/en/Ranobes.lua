@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.14","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.15","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -108,7 +108,7 @@ local function parseNovel(novelURL, loadChapters)
 		description = convertToText("parseNovel"),
 		genres = map(novel:selectFirst("div[itemprop=\"genre\"]"):select("a"), text),
 		tags = map(novel:selectFirst("div[itemprop=\"keywords\"]"):select("a"), text),
-		authors = map(novel:selectFirst("span[itemprop=\"author\"]"):select("a"), text),
+		authors = map(novel:selectFirst("span[itemprop=\"creator\"]"):select("a"), text),
 		status = status
 	}
 
