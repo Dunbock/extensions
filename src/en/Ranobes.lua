@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.13","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.14","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -26,6 +26,10 @@ local function expandURL(url)
 	else
 		return baseURL .. url
 	end
+end
+
+local function shrinkURL(url)
+	return url:gsub(".-ranobes%.net", "")
 end
 
 --- @param page number | nil The page number that is requested.
@@ -184,9 +188,12 @@ return {
 
 	-- Optional values to change
 	imageURL = "https://github.com/Dunbock/extensions/raw/impl-ranobes.net/icons/Ranobes.png",
-	hasCloudFlare = false,
+	hasCloudFlare = true,
 	hasSearch = true,
 	isSearchIncrementing = true,
+
+	shrinkURL = shrinkURL,
+	expandURL = expandURL,
 
 	-- Must have at least one value
 	listings = {
