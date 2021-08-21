@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.21","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.22","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -14,7 +14,7 @@ end
 --- @param url string The path which should extend the baseURL
 --- @return string The baseURL extended by path
 local function expandURL(url)
-	return shrinkURL(url) .. baseURL
+	return baseURL .. shrinkURL(url)
 end
 
 --- @param page number | nil The page number that is requested.
@@ -32,6 +32,7 @@ local function parseNovelsOverview(page, searchParameter)
 	end
 
 	-- Check if there is a search result or a page with that page number and if so parse it, otherwise return no novels.
+
 	local doc = GETDocument(expandURL(url)):selectFirst("div.str_left")
 	if doc:selectFirst("div.alert") then
 		-- Either no search results or the page number is to high
