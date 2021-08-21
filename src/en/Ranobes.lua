@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.17","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.18","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -78,6 +78,7 @@ local function getPassage(chapterURL)
 	htmlElement:select("div.story_tools"):remove()
 	htmlElement:select("div.free-support"):remove() -- Chapter Ads
 
+	Log("RANOBES", pageOfElem(htmlElement))
 	return pageOfElem(htmlElement)
 end
 
