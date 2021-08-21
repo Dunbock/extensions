@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.16","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.17","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -193,6 +193,7 @@ return {
 	hasCloudFlare = true,
 	hasSearch = true,
 	isSearchIncrementing = true,
+	chapterType = ChapterType.HTML,
 
 	shrinkURL = shrinkURL,
 	expandURL = expandURL,
