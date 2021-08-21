@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.18","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.19","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -69,7 +69,7 @@ end
 --- @param chapterURL string The link to the chapter, which contains the chapter content.
 --- @return string The chapter text without the headline as plain text.
 local function getPassage(chapterURL)
-	local htmlElement = GETDocument(self.expandURL(url)):selectFirst("div.story")
+	local htmlElement = GETDocument(expandURL(url)):selectFirst("div.story")
 
 	-- Remove/modify unwanted HTML elements to get a clean webpage.
 	htmlElement:select("meta"):remove()
