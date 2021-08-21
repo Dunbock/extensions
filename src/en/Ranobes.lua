@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.19","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.20","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -8,11 +8,7 @@ local text = function(v) return v:text() end
 --- @param url string The path which should extend the baseURL
 --- @return string The baseURL extended by path
 local function expandURL(url)
-	if url:find("ranobes.net") ~= nil then
-		return url
-	else
-		return baseURL .. url
-	end
+	return shrinkURL(url) .. baseURL
 end
 
 local function shrinkURL(url)
