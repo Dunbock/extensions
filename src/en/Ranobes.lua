@@ -1,22 +1,9 @@
--- {"id":333,"ver":"1.0.15","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.16","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
 -- Used in map for genres, tags and authors
 local text = function(v) return v:text() end
-
-local function dump(o)
-	if type(o) == 'table' then
-		local s = '{ '
-		for k,v in pairs(o) do
-			if type(k) ~= 'number' then k = '"'..k..'"' end
-			s = s .. '['..k..'] = ' .. dump(v) .. ','
-		end
-		return s .. '} '
-	else
-		return tostring(o)
-	end
-end
 
 --- @param url string The path which should extend the baseURL
 --- @return string The baseURL extended by path
@@ -65,13 +52,33 @@ end
 --- @param textElement string HTML-element, which contains the text (using <p> or <br>) that should be converted.
 --- @return string The chapter text without the headline as plain text.
 local function convertToText(htmlElement)
-	return htmlElement
+	-- Remove unwanted html elements.
+	htmlElement:select("div.free-support"):remove() -- Chapter Ads
+	htmlElement:select("style"):remove() -- Description Style
+
+	-- Get the actual chapter content and remove the html. Due to the HTML format no need to add line breaks.
+	local content = htmlElement:html()
+	content = content:gsub("&nbsp;", " ")
+	content = content:gsub("<p>", "")
+	content = content:gsub("</p>", "")
+	content = content:gsub("<br>", "")
+
+	return content
 end
 
 --- @param chapterURL string The link to the chapter, which contains the chapter content.
 --- @return string The chapter text without the headline as plain text.
 local function getPassage(chapterURL)
-	return convertToText(GETDocument(expandURL(chapterURL)):select("div.story > div#arrticle"), true)
+	local htmlElement = GETDocument(self.expandURL(url)):selectFirst("div.story")
+
+	-- Remove/modify unwanted HTML elements to get a clean webpage.
+	htmlElement:select("meta"):remove()
+	htmlElement:select("link[itemprop=\"image\"]"):remove()
+	htmlElement:select("div.icon.iccon-cat"):remove()
+	htmlElement:select("div.story_tools"):remove()
+	htmlElement:select("div.free-support"):remove() -- Chapter Ads
+
+	return pageOfElem(htmlElement)
 end
 
 --	based on ReadLightNovel.lua
@@ -105,7 +112,7 @@ local function parseNovel(novelURL, loadChapters)
 		title = novel:selectFirst("[itemprop=\"name\"]"):text(),
 		-- title is a span when there is no alternative title, otherwise a h1. Therefore leave element name out.
 		imageURL = expandURL(novel:selectFirst("a[href].highslide"):attr("href")),
-		description = convertToText("parseNovel"),
+		description = convertToText(novel:selectFirst("div[itemprop=\"description\"]")),
 		genres = map(novel:selectFirst("div[itemprop=\"genre\"]"):select("a"), text),
 		tags = map(novel:selectFirst("div[itemprop=\"keywords\"]"):select("a"), text),
 		authors = map(novel:selectFirst("span[itemprop=\"creator\"]"):select("a"), text),
@@ -165,20 +172,15 @@ local function search(data)
 		return text:gsub(" ", "+")
 	end
 	-- Create Search String
-	local searchParameter = "No Search Query"
+	local searchParameter = "/f"
 
 	-- Novel title must contain
 	if data[QUERY] ~= ""  then
-		searchParameter = data[QUERY]
+		searchParameter = searchParameter .. "/l.title=" .. parseToURL(data[QUERY])
 	end
 
 	-- Get search result.
-	--return parseNovelsOverview(data[PAGE], searchParameter)
-	return { Novel {
-		title = searchParameter,
-		link = "dummyLinkQuery=" .. searchParameter,
-		imageURL = "https://via.placeholder.com/150.png"
-	} }
+	return parseNovelsOverview(data[PAGE], searchParameter)
 end
 
 return {
