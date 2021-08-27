@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.24","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.25","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -42,8 +42,10 @@ local function parseNovelsOverview(page, searchParameter)
 		return { }
 	else
 		return map(doc:selectFirst("div#dle-content"):select("article.block.story"), function(e)
+			local titleTemp = e:selectFirst("h2.title > a")
+			titleTemp:select("spawn"):remove()
 			return Novel {
-				title = e:selectFirst("h2.title > a"):text(),
+				title = titleTemp:text(),
 				link = expandURL(e:selectFirst("h2.title > a"):attr("href")),
 				imageURL = expandURL(e:selectFirst("figure.cover"):attr("style"):sub(23, -3))
 			}
@@ -71,27 +73,17 @@ end
 --- @param chapterURL string The link to the chapter, which contains the chapter content.
 --- @return string The chapter text without the headline as plain text.
 local function getPassage(chapterURL)
-
-	Log("URL", chapterURL)
-
-	local htmlElement = GETDocument(expandURL(chapterURL))
-
-	Log("DOKUMENT", htmlElement:toString())
-
-	htmlElement = htmlElement:selectFirst("div.story")
-
-	Log("DIVSTORY", htmlElement:toString())
+	local htmlElement = GETDocument(expandURL(chapterURL)):selectFirst("div.story")
 
 	-- Remove/modify unwanted HTML elements to get a clean webpage.
 	htmlElement:select("meta"):remove()
 	htmlElement:select("link[itemprop=\"image\"]"):remove()
 	htmlElement:select("div.icon.iccon-cat"):remove()
+	htmlElement:select("div.category"):remove()
 	htmlElement:select("div.story_tools"):remove()
 	htmlElement:select("div.free-support"):remove() -- Chapter Ads
 
 	Log("CLEANED", htmlElement:toString())
-
-	Log("OUTPUT", pageOfElem(htmlElement))
 	return pageOfElem(htmlElement)
 end
 
@@ -132,6 +124,10 @@ local function parseNovel(novelURL, loadChapters)
 		authors = map(novel:selectFirst("span[itemprop=\"creator\"]"):select("a"), text),
 		status = status
 	}
+
+	Log("Novel", novelURL)
+	Log("Genres", map(novel:selectFirst("div[itemprop=\"genre\"]"):select("a"), text))
+	Log("Tags", map(novel:selectFirst("div[itemprop=\"keywords\"]"):select("a"), text))
 
 	-- Parse the novel chapter information if desired
 	if loadChapters then
