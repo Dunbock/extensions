@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.23","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.24","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -71,7 +71,16 @@ end
 --- @param chapterURL string The link to the chapter, which contains the chapter content.
 --- @return string The chapter text without the headline as plain text.
 local function getPassage(chapterURL)
-	local htmlElement = GETDocument(expandURL(url)):selectFirst("div.story")
+
+	Log("URL", chapterURL)
+
+	local htmlElement = GETDocument(expandURL(chapterURL))
+
+	Log("DOKUMENT", htmlElement:toString())
+
+	htmlElement = htmlElement:selectFirst("div.story")
+
+	Log("DIVSTORY", htmlElement:toString())
 
 	-- Remove/modify unwanted HTML elements to get a clean webpage.
 	htmlElement:select("meta"):remove()
@@ -80,7 +89,9 @@ local function getPassage(chapterURL)
 	htmlElement:select("div.story_tools"):remove()
 	htmlElement:select("div.free-support"):remove() -- Chapter Ads
 
-	Log("RANOBES", pageOfElem(htmlElement))
+	Log("CLEANED", htmlElement:toString())
+
+	Log("OUTPUT", pageOfElem(htmlElement))
 	return pageOfElem(htmlElement)
 end
 
