@@ -1,4 +1,4 @@
--- {"id":333,"ver":"1.0.25","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.26","libVer":"1.0.0","author":"Dunbock"}
 
 local baseURL = "https://www.ranobes.net"
 
@@ -42,11 +42,10 @@ local function parseNovelsOverview(page, searchParameter)
 		return { }
 	else
 		return map(doc:selectFirst("div#dle-content"):select("article.block.story"), function(e)
-			local titleTemp = e:selectFirst("h2.title > a")
-			titleTemp:select("spawn"):remove()
+			local titleElement = e:selectFirst("h2.title > a"):removeChild("spawn")
 			return Novel {
-				title = titleTemp:text(),
-				link = expandURL(e:selectFirst("h2.title > a"):attr("href")),
+				title = titleElement:text(),
+				link = expandURL(titleElement:attr("href")),
 				imageURL = expandURL(e:selectFirst("figure.cover"):attr("style"):sub(23, -3))
 			}
 		end)
@@ -78,12 +77,10 @@ local function getPassage(chapterURL)
 	-- Remove/modify unwanted HTML elements to get a clean webpage.
 	htmlElement:select("meta"):remove()
 	htmlElement:select("link[itemprop=\"image\"]"):remove()
-	htmlElement:select("div.icon.iccon-cat"):remove()
-	htmlElement:select("div.category"):remove()
-	htmlElement:select("div.story_tools"):remove()
+	htmlElement:select("div.category"):remove() -- Links to novel or genres
+	htmlElement:select("div.story_tools"):remove() -- Bookmark, rate, ...
 	htmlElement:select("div.free-support"):remove() -- Chapter Ads
 
-	Log("CLEANED", htmlElement:toString())
 	return pageOfElem(htmlElement)
 end
 
@@ -125,9 +122,22 @@ local function parseNovel(novelURL, loadChapters)
 		status = status
 	}
 
+	local function dump(o)
+		if type(o) == 'table' then
+			local s = '{ '
+			for k,v in pairs(o) do
+				if type(k) ~= 'number' then k = '"'..k..'"' end
+				s = s .. '['..k..'] = ' .. dump(v) .. ','
+			end
+			return s .. '} '
+		else
+			return tostring(o)
+		end
+	end
+
 	Log("Novel", novelURL)
-	Log("Genres", map(novel:selectFirst("div[itemprop=\"genre\"]"):select("a"), text))
-	Log("Tags", map(novel:selectFirst("div[itemprop=\"keywords\"]"):select("a"), text))
+	Log("Genres", dump(map(novel:selectFirst("div[itemprop=\"genre\"]"):select("a"), text)))
+	Log("Tags", dump(map(novel:selectFirst("div[itemprop=\"keywords\"]"):select("a"), text)))
 
 	-- Parse the novel chapter information if desired
 	if loadChapters then
