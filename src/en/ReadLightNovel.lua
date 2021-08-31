@@ -1,4 +1,4 @@
--- {"id":6118,"ver":"1.0.4","libVer":"1.0.0","author":"TechnoJo4"}
+-- {"id":6118,"ver":"2.0.0","libVer":"1.0.0","author":"TechnoJo4"}
 
 local baseURL = "https://www.readlightnovel.org"
 local qs = Require("url").querystring
@@ -44,6 +44,7 @@ return {
 	name = "ReadLightNovel",
 	baseURL = baseURL,
 	imageURL = "https://github.com/shosetsuorg/extensions/raw/dev/icons/ReadLightNovel.png",
+	chapterType = ChapterType.HTML,
 
 	shrinkURL = shrinkURL,
 	expandURL = expandURL,
@@ -55,16 +56,13 @@ return {
 	},
 
 	getPassage = function(chapterURL)
-		return pipeline
-				(GETDocument(expandURL(chapterURL)):selectFirst(".container--content .row .desc"):children())
-				(filter, function(v)
-					return v:tagName() ~= "script"
-				end)
-				(map, text)
-				(filter, function(v)
-					return not v:match("support RLN")
-				end)
-				(table.concat, "\n")()
+		local htmlElement = GETDocument(expandURL(chapterURL)):selectFirst("div#chapterhidden")
+
+		-- Remove/modify unwanted HTML elements to get a clean webpage.
+		htmlElement:removeAttr("class") -- Remove hidden
+		--htmlElement:select("br"):remove()
+
+		return pageOfElem(htmlElement)
 	end,
 
 	parseNovel = function(novelURL, loadChapters)
@@ -79,13 +77,15 @@ return {
 			title = doc:selectFirst(".block-title h1"):text(),
 			imageURL = left:selectFirst(".novel-cover img"):attr("src"),
 			description = table.concat(map(details:selectFirst(".novel-detail-body"):select("p"), text), "\n"),
-			alternativeTitles = map(details:selectFirst(".novel-detail-item.color-gray"):select("li a"), text),
 			status = ({
 				Ongoing = NovelStatus("PUBLISHING"),
 				Completed = NovelStatus("COMPLETED")
 			})[leftdetails:get(leftdetails:size()-1):selectFirst("li"):text()],
 			language = leftdetails:get(3):selectFirst("li"):text()
 		}
+		if details:selectFirst(".novel-detail-item.color-gray") ~= nil then
+			info:setAlternativeTitles(map(details:selectFirst(".novel-detail-item.color-gray"):select("li a"), text))
+		end
 
 		if loadChapters then
 			local i = 0
