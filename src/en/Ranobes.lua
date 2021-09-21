@@ -1,6 +1,6 @@
--- {"id":333,"ver":"1.0.26","libVer":"1.0.0","author":"Dunbock"}
+-- {"id":333,"ver":"1.0.27","libVer":"1.0.0","author":"Dunbock"}
 
-local baseURL = "https://www.ranobes.net"
+local baseURL = "https://ranobes.net"
 
 -- Used in map for genres, tags and authors
 local text = function(v) return v:text() end
