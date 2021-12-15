@@ -195,7 +195,7 @@ local function search(data)
 	local searchParameter = "/f"
 
 	-- Novel title must contain
-	if data[QUERY] ~= ""  then
+	if data[QUERY] and data[QUERY] ~= ""  then
 		searchParameter = searchParameter .. "/l.title=" .. parseToURL(data[QUERY])
 	end
 
@@ -225,17 +225,8 @@ return {
 		end)
 	},
 
-	-- Optional if usable
-	searchFilters = {
-	},
-	settings = {
-	},
-
 	-- Default functions that have to be set
-	getPassage = getPassage,
 	parseNovel = parseNovel,
-	search = search,
-	updateSetting = function(id, value)
-		settings[id] = value
-	end
+	getPassage = getPassage,
+	search = search
 }
